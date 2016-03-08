@@ -1,4 +1,5 @@
 require('babel-register')
+require('babel-polyfill')
 
 GLOBAL.Hexo = require('hexo')
 GLOBAL.fs = require('hexo-fs')

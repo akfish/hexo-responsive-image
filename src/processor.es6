@@ -13,15 +13,13 @@ export default class ImageProcessor {
     this.opts = opts
     this._tasks = {}
   }
-  _loadImage ({ absoluteSrc }) {
-    return fs.readFile(absoluteSrc, { encoding: null, escape: false })
-      .then((buf) => {
-        let hash = createHash('sha256')
-        hash.update(buf)
+  async _loadImage ({ absoluteSrc }) {
+    let buf = await fs.readFile(absoluteSrc, { encoding: null, escape: false })
+    let hash = createHash('sha256')
+    hash.update(buf)
 
-        let sha = hash.digest('hex')
-        return [buf, sha]
-      })
+    let sha = hash.digest('hex')
+    return [buf, sha]
   }
   _getFileNames (image, sha) {
     let { sizes, file_name_pattern } = this.opts
@@ -46,32 +44,35 @@ export default class ImageProcessor {
       }
     })
   }
-  _doResize (buf, dstFileInfo) {
+  async _doResize (buf, dstFileInfo) {
     let { filePath, fileName, opts } = dstFileInfo
     let g = gm(buf)
-    return g.sizeAsync()
-      .then((size) => {
-        if (size.width < opts.width || size.height < opts.height) throw new RangeError(`Cannot generate ${fileName}: original image is too small`)
-        g.resize(opts.width, opts.height, '^')
-        return g.writeAsync(filePath)
-      })
-      .then(() => ({ status: 'created' }))
+    let size = await g.sizeAsync()
+
+    if (size.width < opts.width || size.height < opts.height) throw new RangeError(`Cannot generate ${fileName}: original image is too small`)
+    g.resize(opts.width, opts.height, '^')
+    await g.writeAsync(filePath)
+
+    return { status: 'created' }
   }
-  _resize (buf, dstFileInfo) {
-    let { filePath } = dstFileInfo
-    return fs.exists(filePath)
-      .then((exists) => {
-        return exists ? { status: 'cached' } : this._doResize(buf, dstFileInfo)
-      })
-      .then(({ status }) => {
-        dstFileInfo.status = status
-        return dstFileInfo
-      })
-      .catch((e) => {
-        dstFileInfo.status = 'error'
-        dstFileInfo.error = e
-        return dstFileInfo
-      })
+  async _resize (buf, dstFileInfo) {
+    try {
+      let { filePath } = dstFileInfo
+      let exists = await fs.exists(filePath)
+      let { status } = exists ? { status: 'cached' } : await this._doResize(buf, dstFileInfo)
+      dstFileInfo.status = status
+    } catch (e) {
+      dstFileInfo.status = 'error'
+      dstFileInfo.error = e
+    }
+
+    return dstFileInfo
+  }
+  async _process (image) {
+    let [ buf, sha ] = await this._loadImage(image)
+    let dstFiles = this._getFileNames(image, sha)
+    image.srcset = await Promise.all(dstFiles.map((file) => this._resize(buf, file)))
+    return image
   }
   process (image) {
     let task = this._tasks[image.absoluteSrc]
@@ -79,15 +80,7 @@ export default class ImageProcessor {
     // lookup existing promise by path
     if (task) return task
 
-    this._tasks[image.absoluteSrc] = task = this._loadImage(image)
-      .spread((buf, sha) => {
-        let dstFiles = this._getFileNames(image, sha)
-        return Promise.map(dstFiles, (file) => this._resize(buf, file))
-      })
-      .then((srcset) => {
-        image.srcset = srcset
-        return image
-      })
+    this._tasks[image.absoluteSrc] = task = this._process(image)
 
     return task
   }
