@@ -1,9 +1,23 @@
 import _ from 'underscore'
 import PostFilter from './filter/post'
 import InjectFilter from './filter/inject'
+import ImageProcessor from './processor'
 
 const DEFAULT_OPTS = {
-
+  front_matter_fields: [],
+  file_name_pattern: ':name-:hash-:width-:type:ext',
+  sizes: {
+    large: {
+      width: 1024
+      // media: '(min-width: 36em)'
+    },
+    medium: {
+      width: 640
+    },
+    small: {
+      width: 320
+    }
+  }
 }
 
 export default class Responsive {
@@ -14,6 +28,8 @@ export default class Responsive {
       new PostFilter(this),
       new InjectFilter(this)
     ]
+    this.processor = new ImageProcessor(this.opts)
+    this._tasks = {}
   }
 
   register () {
@@ -21,13 +37,14 @@ export default class Responsive {
   }
 
   queueImages (id, images) {
-    // TODO: check if images are processed, if not, do so
-    // TODO: store processing results
-    // TODO: store promises id => Promise.all([image_promises])
+    // TODO: throw error on duplication
+    let task = Promise.map(images, (img) => this.processor.process(img))
+      .reduce((all, curr) => all.concat(curr), [])
+    this._tasks[id] = task
   }
 
   waitForImages (id) {
-    // TODO: find the promise by id
+    return this._tasks[id]
   }
 }
 

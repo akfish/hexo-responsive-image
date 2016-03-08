@@ -1,8 +1,6 @@
 describe "Post Filters", ->
   describe "before_post_render", ->
-    it "should extract Markdown images"
-    it "should extract image tags"
-    it "should extract asset image tags"
+    it "should extract images"
     it "should extract images in front-matter field as configured"
     it "should resolve image path"
   describe "after_post_render", ->

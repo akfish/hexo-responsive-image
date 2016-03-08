@@ -45,5 +45,14 @@
       "bail": false,
       "ignoreLeaks": false
     }
+  },
+  "cli:default": {
+    "opts": {
+      "mapping": {
+        "mocha:default": {
+          "opts.grep": "only"
+        }
+      }
+    }
   }
 }

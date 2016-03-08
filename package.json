@@ -36,7 +36,8 @@
     "gulp-mocha": "^2.2.0",
     "hexo": "^3.2.0",
     "hexo-fs": "^0.1.5",
-    "snazzy": "^3.0.0"
+    "snazzy": "^3.0.0",
+    "underscore": "^1.8.3"
   },
   "standard": {
     "globals": [
@@ -44,6 +45,8 @@
     ]
   },
   "dependencies": {
+    "bluebird": "^3.3.3",
+    "gm": "^1.21.1",
     "underscore": "^1.8.3"
   }
 }
