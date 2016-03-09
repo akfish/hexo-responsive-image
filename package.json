@@ -52,7 +52,7 @@
     "parser": "babel-eslint"
   },
   "dependencies": {
-    "bluebird": "^3.3.3",
+    "bluebird": "^3.3.4",
     "gm": "^1.21.1",
     "underscore": "^1.8.3"
   }

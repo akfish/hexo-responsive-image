@@ -71,7 +71,7 @@ export default class ImageProcessor {
   async _process (image) {
     let [ buf, sha ] = await this._loadImage(image)
     let dstFiles = this._getFileNames(image, sha)
-    image.srcset = await Promise.all(dstFiles.map((file) => this._resize(buf, file)))
+    image.srcset = await Promise.map(dstFiles, (file) => this._resize(buf, file))
     return image
   }
   process (image) {

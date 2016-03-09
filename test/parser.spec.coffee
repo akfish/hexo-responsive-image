@@ -22,6 +22,8 @@ describe "Parser", ->
     barz: "not an image"
     content: content
 
+  checkRange = ({ start, length, content: actual }) ->
+    actual.should.equal(content.substr(start, length))
 
   before ->
     results = _.groupBy(parser.parseData(data), "type")
@@ -49,7 +51,9 @@ describe "Parser", ->
         title: 'Optional title'
       }
     ].forEach (exp) ->
-      markdown.find(({ src }) -> src == exp.src).should.deep.equal(exp)
+      actual = markdown.find(({ src }) -> src == exp.src)
+      checkRange(actual.range)
+      _.omit(actual, 'range').should.deep.equal(exp)
 
   it "should parse <img> tags", ->
     { html } = results
@@ -64,7 +68,9 @@ describe "Parser", ->
         src: '/path/to/img'
       }
     ].forEach (exp) ->
-      html.find(({ src }) -> src == exp.src).should.deep.equal(exp)
+      actual = html.find(({ src }) -> src == exp.src)
+      checkRange(actual.range)
+      _.omit(actual, 'range').should.deep.equal(exp)
 
   it "should parse Hexo image tags"
 
@@ -81,3 +87,12 @@ describe "Parser", ->
           key: key_name
           src: data[key_name]
         }
+
+  it "should tokenize text", ->
+    tokens = parser.tokenize(content)
+    text = ""
+    tokens.forEach ({ range }) ->
+      checkRange(range)
+      text += range.content
+
+    text.should.equal(content)
