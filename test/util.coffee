@@ -4,11 +4,13 @@ Responsive = require('../src/responsive')
 module.exports =
   initHexo: (name) ->
     base_dir = path.join(__dirname, name)
-    hexo = new Hexo(base_dir, silent: true)
+    hexo = new Hexo(base_dir, silent: false)
     responsive = new Responsive(hexo)
+    responsive.register()
 
     setup = ->
       fs.mkdirs(base_dir).then(-> hexo.init())
+        .then(-> hexo.loadPlugin(require.resolve('hexo-renderer-marked')))
 
     teardown = ->
       fs.rmdir(base_dir)
