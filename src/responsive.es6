@@ -1,4 +1,5 @@
 import _ from 'underscore'
+import Promise from 'bluebird'
 import PostFilter from './filter/post'
 import InjectFilter from './filter/inject'
 import ImageProcessor from './processor'
@@ -38,12 +39,14 @@ export default class Responsive {
 
   queueImages (id, images) {
     // TODO: throw error on duplication
+    this.hexo.log.info(`Queue ${images.length} images from: ${id}`)
     let task = Promise.map(images, (img) => this.processor.process(img))
       .reduce((all, curr) => all.concat(curr), [])
     this._tasks[id] = task
   }
 
   waitForImages (id) {
+    this.hexo.log.info(`Get task: ${id}`)
     return this._tasks[id]
   }
 }

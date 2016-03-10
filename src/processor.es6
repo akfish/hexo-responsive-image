@@ -23,7 +23,7 @@ export default class ImageProcessor {
   }
   _getFileNames (image, sha) {
     let { sizes, file_name_pattern } = this.opts
-    let { absoluteSrc } = image
+    let { absoluteSrc, srcBase } = image
     let hash = sha.substr(0, 6)
     let ext = path.extname(absoluteSrc)
     let fullName = path.basename(absoluteSrc)
@@ -35,8 +35,10 @@ export default class ImageProcessor {
     return _.map(sizes, (o, type) => {
       let fileName = pattern.stringify(_.extend(args, o, { type }))
       let filePath = path.resolve(base, fileName)
+      let src = path.posix.join(srcBase, fileName)
       return {
         type,
+        src,
         opts: o,
         base,
         fileName,

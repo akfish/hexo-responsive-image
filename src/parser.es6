@@ -2,7 +2,7 @@ import _ from 'underscore'
 
 const IMAGE_TAG_HEXO_REGEX = /{%\s+(asset_img|img)\s+(.*?)\s+%}/g
 const IMAGE_TAG_MARKDOWN_REGEX = /!\[(.*?)\]\((.*?)(?:\s+['"]?(.*?)['"]?)?\)/g
-const IMAGE_TAG_HTML_REGEX = /<img\s+(.*?)\s*\/>/g
+const IMAGE_TAG_HTML_REGEX = /<img\s+(.*?)\s*\/?>/g
 const HTML_ATTR_REGEX = /(\w+)=['"](.*?)['"]/
 
 function execAll (r, text, tokenizer) {
