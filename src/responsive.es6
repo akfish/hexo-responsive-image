@@ -1,3 +1,4 @@
+import _ from 'underscore'
 import Promise from 'bluebird'
 import PostFilter from './filter/post'
 import InjectFilter from './filter/inject'
@@ -21,12 +22,45 @@ export default class Responsive {
     this.filters.forEach((f) => f.register())
   }
 
-  queueImages (id, images) {
+  handleError (data, images) {
+    let { log } = this.hexo
+    let errors = {}
+    let errorCount = 0
+    images.forEach(({ srcset, src }) => {
+      let errs = srcset.filter((i) => i.status === 'error')
+      if (errs.length > 0) {
+        errorCount += errs.length
+        errors[src] = errs
+      }
+    })
+    log.info(`[hexo-responsive-image] <${data.title}> processed ${images.length} images with ${errorCount} errors`)
+    if (errorCount > 0) {
+      _.each(errors, (errs, img) => {
+        log.error(img)
+        errs.forEach((e) => log.error('> ' + e.error.message))
+      })
+    }
+  }
+
+  handleCreated (data, images) {
+    let { log } = this.hexo
+    images.forEach(({ srcset }) => {
+      let created = srcset.filter((i) => i.status === 'created')
+      created.forEach(({ src }) => {
+        log.info(`[CREATED] Serve ${src}`)
+      })
+    })
+  }
+
+  queueImages (data, images) {
+    let { log } = this.hexo
+    let id = data._id
     // TODO: throw error on duplication
-    this.hexo.log.info(`Queue ${images.length} images from: ${id}`)
+    log.info(`Queue ${images.length} images from: ${id}`)
     let task = Promise.map(images, (img) => this.processor.process(img))
       .reduce((all, curr) => all.concat(curr), [])
-    // TODO: handle image errors
+      .tap((images) => this.handleError(data, images))
+      .tap((images) => this.handleCreated(data, images))
     // TODO: generate routes for newly created images
     this._tasks[id] = task
   }

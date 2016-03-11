@@ -36,7 +36,7 @@ export default class PostFilter {
   async _process (data) {
     let { parser } = this
     let images = await Promise.map(parser.parseData(data), this._resolveImagePath.bind(this))
-    this.responsive.queueImages(data._id, images.filter((image) => image.resolved))
+    this.responsive.queueImages(data, images.filter((image) => image.resolved))
     return data
   }
   _buildResponsiveImg (image) {
@@ -52,35 +52,16 @@ export default class PostFilter {
   }
   async _apply (data) {
     let { parser } = this
-    let { log } = this.hexo
     let images = await this.responsive.waitForImages(data._id)
 
     data.images = images
 
     let imageMap = {}
     // Check for errors
-    let errors = {}
-    let errorCount = 0
     images.forEach((image) => {
-      let err = []
       imageMap[image.src] = image
-      image.srcset = image.srcset.filter((i) => {
-        if (i.status === 'error') {
-          err.push(i)
-          errorCount++
-        }
-        return i.status !== 'error'
-      })
-      if (err.length > 0) errors[image.src] = err
+      image.srcset = image.srcset.filter((i) => i.status !== 'error')
     })
-    // log errors
-    log.info(`[hexo-responsive-image] <${data.title}> processed ${images.length} images with ${errorCount} errors`)
-    if (errorCount > 0) {
-      _.each(errors, (errs, img) => {
-        log.error(img)
-        errs.forEach((e) => log.error('> ' + e.error.message))
-      })
-    }
     // extract all <img> tags in rendered HTML
     // TODO: replace with <picture>
     let tokens = parser.tokenize(data.content, ['Html'])
