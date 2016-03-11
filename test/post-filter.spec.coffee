@@ -1,4 +1,15 @@
+util = require('./util')
+
 describe "Post Filters", ->
+  h = {hexo, locals} = util.initHexo('test_filter')
+
+  before ->
+    this.timeout(0)
+    h.setup()
+      .then(-> hexo.call('generate', {}))
+
+  after h.teardown
+
   describe "before_post_render", ->
     it "should extract images"
     it "should extract images in front-matter field as configured"

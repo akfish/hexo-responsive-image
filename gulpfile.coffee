@@ -10,4 +10,5 @@ require('./gulp-task/es6')('default')
 require('./gulp-task/mocha')('default')
 #>
 #< contents
+require('./gulp-task/test-asset')()
 #>

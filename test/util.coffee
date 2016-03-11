@@ -1,16 +1,24 @@
+Promise = require('bluebird')
 path = require('path')
 Responsive = require('../src/responsive')
 
 module.exports =
   initHexo: (name) ->
+    site_dir = "./test/site"
+    if !fs.existsSync(site_dir) then throw new Error("Test site not found. Run `gulp asset:test` first.")
     base_dir = path.join(__dirname, name)
     hexo = new Hexo(base_dir, silent: false)
     responsive = new Responsive(hexo)
     responsive.register()
 
     setup = ->
-      fs.mkdirs(base_dir).then(-> hexo.init())
-        .then(-> hexo.loadPlugin(require.resolve('hexo-renderer-marked')))
+      fs.copyDir(site_dir, base_dir).then(-> hexo.init())
+        .then(->
+          Promise.map([
+            'hexo-renderer-marked'
+            'hexo-renderer-ejs'
+          ], (m) -> hexo.loadPlugin(require.resolve(m)))
+        )
 
     teardown = ->
       fs.rmdir(base_dir)

@@ -42,11 +42,14 @@ export default class PostFilter {
   }
   _buildResponsiveImg (image) {
     // TODO: use config
-    let srcset = image.srcset.map((s) => `${s.src} ${s.opts.width}w`).join(',')
+    let srcset = image.srcset.map((s) => `<source srcset='${s.src}' media='(min-width: ${s.opts.width}px)'>`).join('')
     // TODO: use config
     let src = image.srcset.find((s) => s.type === 'medium').src || image.src
     // TODO: other attributes
-    return `<img srcset='${srcset}' src='${src}' alt='${image.alt}' />`
+    return `<picture>
+      ${srcset}
+      <img src='${src}' alt='${image.alt}' />
+    </picture>`
   }
   async _apply (data) {
     let { parser } = this
