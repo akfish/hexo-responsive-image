@@ -3,6 +3,7 @@ import Promise from 'bluebird'
 import PostFilter from './filter/post'
 import InjectFilter from './filter/inject'
 import ImageProcessor from './processor'
+import ImageGenerator from './generator/image'
 import { getOptions } from './option'
 
 export default class Responsive {
@@ -10,16 +11,18 @@ export default class Responsive {
     this.hexo = hexo
     // opts will override hexo.config.responsive
     this.opts = getOptions(opts || hexo.config.responsive)
-    this.filters = [
+    this._imageGenerator = new ImageGenerator(this)
+    this.plugins = [
       new PostFilter(this),
-      new InjectFilter(this)
+      new InjectFilter(this),
+      this._imageGenerator
     ]
     this.processor = new ImageProcessor(this.opts)
     this._tasks = {}
   }
 
   register () {
-    this.filters.forEach((f) => f.register())
+    this.plugins.forEach((f) => f.register())
   }
 
   handleError (data, images) {
@@ -43,11 +46,10 @@ export default class Responsive {
   }
 
   handleCreated (data, images) {
-    let { log } = this.hexo
     images.forEach(({ srcset }) => {
       let created = srcset.filter((i) => i.status === 'created')
-      created.forEach(({ src }) => {
-        log.info(`[CREATED] Serve ${src}`)
+      created.forEach((img) => {
+        this._imageGenerator.push(img)
       })
     })
   }

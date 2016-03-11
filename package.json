@@ -39,7 +39,6 @@
     "gulp-heap": "^2.0.0-alpha.1",
     "gulp-mocha": "^2.2.0",
     "hexo": "^3.2.0",
-    "hexo-fs": "^0.1.5",
     "hexo-renderer-ejs": "^0.2.0",
     "hexo-renderer-marked": "^0.2.10",
     "install": "^0.5.6",
@@ -56,6 +55,7 @@
   "dependencies": {
     "bluebird": "^3.3.4",
     "gm": "^1.21.1",
+    "hexo-fs": "^0.1.5",
     "underscore": "^1.8.3"
   }
 }
