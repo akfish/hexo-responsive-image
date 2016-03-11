@@ -23,7 +23,6 @@ export default class PostFilter {
       theme.base
     ].map((p) => path.join(p, image.src))
 
-    image.srcBase = path.posix.dirname(image.src)
     let exists = await Promise.map(paths, (p) => fs.exists(p))
     let hit = exists.indexOf(true)
     image.resolved = hit >= 0
@@ -89,7 +88,8 @@ export default class PostFilter {
       let { type, range } = token
       if (type === 'text') return range.content
       let image = imageMap[token.src]
-      return image ? this._buildResponsiveImg(image) : range.content
+      // return image ? this._buildResponsiveImg(image) : range.content
+      return image ? image.toHTML(this.opts) : range.content
     }).join('')
     return data
   }

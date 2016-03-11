@@ -1,30 +1,14 @@
-import _ from 'underscore'
 import Promise from 'bluebird'
 import PostFilter from './filter/post'
 import InjectFilter from './filter/inject'
 import ImageProcessor from './processor'
-
-const DEFAULT_OPTS = {
-  front_matter_fields: [],
-  file_name_pattern: ':name-:hash-:width-:type:ext',
-  sizes: {
-    large: {
-      width: 1024
-      // media: '(min-width: 36em)'
-    },
-    medium: {
-      width: 640
-    },
-    small: {
-      width: 320
-    }
-  }
-}
+import { getOptions } from './option'
 
 export default class Responsive {
   constructor (hexo, opts) {
     this.hexo = hexo
-    this.opts = _.defaults({}, opts, DEFAULT_OPTS)
+    // opts will override hexo.config.responsive
+    this.opts = getOptions(opts || hexo.config.responsive)
     this.filters = [
       new PostFilter(this),
       new InjectFilter(this)
@@ -42,6 +26,8 @@ export default class Responsive {
     this.hexo.log.info(`Queue ${images.length} images from: ${id}`)
     let task = Promise.map(images, (img) => this.processor.process(img))
       .reduce((all, curr) => all.concat(curr), [])
+    // TODO: handle image errors
+    // TODO: generate routes for newly created images
     this._tasks[id] = task
   }
 
@@ -50,5 +36,3 @@ export default class Responsive {
     return this._tasks[id]
   }
 }
-
-Responsive.DEFAULT_OPTS = DEFAULT_OPTS
