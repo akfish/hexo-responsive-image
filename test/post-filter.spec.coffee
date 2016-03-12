@@ -78,7 +78,6 @@ describe "Post Filters", ->
       foo_responsive.src.should.equal(foo)
       foo_responsive.srcset.should.be.an('array').of.length(3)
     it "should replace <img> tags with responsive <picture> in renderer HTML", ->
-      fs.writeFile('f:\\temp\\content.txt', processed.content)
       expected = """\
       <p>This is a image test post.</p>
       <p><picture><source srcset='/images/foo-02a7b7-1024-large.jpg' media='(min-width: 1024px)'><source srcset='/images/foo-02a7b7-640-medium.jpg' media='(min-width: 640px)'><source srcset='/images/foo-02a7b7-320-small.jpg' media='(min-width: 320px)'><img src='/images/foo-02a7b7-640-medium.jpg' alt="" /></picture></p>
