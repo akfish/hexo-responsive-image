@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "lint": "standard --verbose src/**/*.es6 | snazzy",
-    "test": "gulp test"
+    "test": "gulp test",
+    "prepublish": "gulp clean && gulp es6"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "hexo-renderer-marked": "^0.2.10",
     "install": "^0.5.6",
     "npm": "^3.8.0",
+    "sinon": "^1.17.3",
     "snazzy": "^3.0.0",
     "underscore": "^1.8.3"
   },

@@ -58,7 +58,7 @@ export class ImageTag extends Token {
         let media = _.isFunction(mediaFn) ? mediaFn(s) : ''
         return `<source srcset='${s.src}' media='${media}'>`
       }).join('')
-      src = this.srcset.find((s) => s.opts.default === true).src || this.src
+      src = (this.srcset.find((s) => s.opts.default === true) || this).src
     }
     // TODO: other attributes
     let html = `<picture>${srcset}<img src='${src}' alt="${this.alt || ''}" /></picture>`

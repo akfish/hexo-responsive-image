@@ -1,5 +1,6 @@
 Processor = require('../src/processor')
-{ DEFAULT_OPTS } = require('../src/responsive')
+{ ImageTag } = require('../src/parser/token')
+{ DEFAULT_OPTS, getOptions } = require('../src/option')
 path = require('path')
 _ = require('underscore')
 
@@ -25,9 +26,16 @@ describe "Processor", ->
   after ->
     fs.rmdir(tmp_dir)
 
+  mockImage = (src) ->
+    image = new ImageTag(null, 'mock')
+    image.src = src
+    image.absoluteSrc = path.join(tmp_dir, 'source', src)
+
+    image
+
   it "should process an image into multiple sizes", ->
     this.timeout(0)
-    img = absoluteSrc: path.resolve(tmp_dir, './source/images/foo.jpg')
+    img = mockImage('/images/foo.jpg')
 
     processor.process(img)
       .then (img) ->
@@ -40,7 +48,7 @@ describe "Processor", ->
   it "should skip if an image is already processed", ->
     this.timeout(0)
     another_processor = new Processor(DEFAULT_OPTS)
-    img = absoluteSrc: path.resolve(tmp_dir, './source/images/foo.jpg')
+    img = mockImage('/images/foo.jpg')
 
     another_processor.process(img)
       .then (img) ->
@@ -52,7 +60,7 @@ describe "Processor", ->
 
   it "should process each file exactly once", ->
     this.timeout(0)
-    img = absoluteSrc: path.resolve(tmp_dir, './source/images/bar.jpg')
+    img = mockImage('/images/bar.jpg')
 
     p1 = processor.process(img)
     p2 = processor.process(img)
@@ -63,7 +71,7 @@ describe "Processor", ->
 
   it "should skip sizes that are larger than the original", ->
     this.timeout(0)
-    img = absoluteSrc: path.resolve(tmp_dir, './source/images/baz.jpg')
+    img = mockImage('/images/baz.jpg')
 
     processor.process(img)
       .then (img) ->
@@ -76,3 +84,12 @@ describe "Processor", ->
           else
             s.status.should.equal('created')
             fs.exists(s.filePath).should.eventually.be.true
+
+  it "should generate HTML tag from processed image", ->
+    this.timeout(0)
+    foo = mockImage('/images/foo.jpg')
+
+    expected = "<picture><source srcset='/images/foo-02a7b7-1024-large.jpg' media='(min-width: 1024px)'><source srcset='/images/foo-02a7b7-640-medium.jpg' media='(min-width: 640px)'><source srcset='/images/foo-02a7b7-320-small.jpg' media='(min-width: 320px)'><img src='/images/foo-02a7b7-640-medium.jpg' alt=\"\" /></picture>"
+    processor.process(foo)
+      .then (foo) ->
+        foo.toHTML(getOptions()).should.equal(expected)

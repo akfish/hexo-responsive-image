@@ -1,3 +1,4 @@
+require('babel-polyfill')
 import _ from 'underscore'
 import Parser from '../parser'
 import fs from 'hexo-fs'
@@ -39,31 +40,18 @@ export default class PostFilter {
     this.responsive.queueImages(data, images.filter((image) => image.resolved))
     return data
   }
-  _buildResponsiveImg (image) {
-    // TODO: use config
-    let srcset = image.srcset.map((s) => `<source srcset='${s.src}' media='(min-width: ${s.opts.width}px)'>`).join('')
-    // TODO: use config
-    let src = image.srcset.find((s) => s.type === 'medium').src || image.src
-    // TODO: other attributes
-    return `<picture>
-      ${srcset}
-      <img src='${src}' alt='${image.alt}' />
-    </picture>`
-  }
   async _apply (data) {
-    let { parser } = this
+    let { parser, opts } = this
     let images = await this.responsive.waitForImages(data._id)
 
     data.images = images
 
     let imageMap = {}
-    // Check for errors
     images.forEach((image) => {
       imageMap[image.src] = image
       image.srcset = image.srcset.filter((i) => i.status !== 'error')
     })
     // extract all <img> tags in rendered HTML
-    // TODO: replace with <picture>
     let tokens = parser.tokenize(data.content, ['Html'])
     data.content = tokens.map((token) => {
       let { type, range } = token
@@ -72,6 +60,12 @@ export default class PostFilter {
       // return image ? this._buildResponsiveImg(image) : range.content
       return image ? image.toHTML(this.opts) : range.content
     }).join('')
+    // create xxx_responsive fields in front-matter
+    opts.front_matter_fields.forEach((f) => {
+      let src = data[f]
+      let image = imageMap(src)
+      if (image) data[`${f}_responsive`] = image
+    })
     return data
   }
 }
