@@ -1,7 +1,6 @@
 import _ from 'underscore'
 import Promise from 'bluebird'
 import PostFilter from './filter/post'
-import InjectFilter from './filter/inject'
 import ImageProcessor from './processor'
 import ImageGenerator from './generator/image'
 import { getOptions } from './option'
@@ -12,9 +11,9 @@ export default class Responsive {
     // opts will override hexo.config.responsive
     this.opts = getOptions(opts || hexo.config.responsive)
     this._imageGenerator = new ImageGenerator(this)
+    this._postFilter = new PostFilter(this)
     this.plugins = [
-      new PostFilter(this),
-      new InjectFilter(this),
+      this._postFilter,
       this._imageGenerator
     ]
     this.processor = new ImageProcessor(this.opts)
@@ -57,6 +56,7 @@ export default class Responsive {
   queueImages (data, images) {
     let { log } = this.hexo
     let id = data._id
+    images = _.uniq(images, (img) => img.src)
     // TODO: throw error on duplication
     log.info(`Queue ${images.length} images from: ${id}`)
     let task = Promise.map(images, (img) => this.processor.process(img))

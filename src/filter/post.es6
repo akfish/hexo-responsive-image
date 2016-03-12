@@ -21,7 +21,7 @@ export default class PostFilter {
     let { source, theme, log } = this.hexo
     let paths = [
       source.base,
-      theme.base
+      path.join(theme.base, 'source')
     ].map((p) => path.join(p, image.src))
 
     let exists = await Promise.map(paths, (p) => fs.exists(p))
@@ -63,7 +63,7 @@ export default class PostFilter {
     // create xxx_responsive fields in front-matter
     opts.front_matter_fields.forEach((f) => {
       let src = data[f]
-      let image = imageMap(src)
+      let image = imageMap[src]
       if (image) data[`${f}_responsive`] = image
     })
     return data

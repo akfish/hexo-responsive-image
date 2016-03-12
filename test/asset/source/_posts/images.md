@@ -1,5 +1,6 @@
 title: Images
 date: 2013-12-26 22:46:49
+foo: /images/foo.jpg
 ---
 
 This is a image test post.

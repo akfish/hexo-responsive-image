@@ -3,13 +3,14 @@ path = require('path')
 Responsive = require('../src/responsive')
 
 module.exports =
-  initHexo: (name) ->
+  initHexo: (name, opts = register: true) ->
     site_dir = "./test/site"
     if !fs.existsSync(site_dir) then throw new Error("Test site not found. Run `gulp asset:test` first.")
     base_dir = path.join(__dirname, name)
-    hexo = new Hexo(base_dir, silent: false)
+    hexo = new Hexo(base_dir, silent: true)
     responsive = new Responsive(hexo)
-    responsive.register()
+    if opts.register
+      responsive.register()
 
     setup = ->
       fs.copyDir(site_dir, base_dir).then(-> hexo.init())

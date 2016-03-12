@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "lint": "standard --verbose src/**/*.es6 | snazzy",
+    "pretest": "gulp clean:test && gulp asset:test",
     "test": "gulp test",
     "prepublish": "gulp clean && gulp es6"
   },
