@@ -1,4 +1,5 @@
-require('babel-polyfill')
+if (!global._babelPolyfill) require('babel-polyfill')
+
 import Promise from 'bluebird'
 import path from 'path'
 import _ from 'underscore'

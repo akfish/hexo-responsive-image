@@ -51,6 +51,9 @@
       "mapping": {
         "mocha:default": {
           "opts.grep": "only"
+        },
+        "GLOBAL": {
+          "sourceMap": "debug"
         }
       }
     }

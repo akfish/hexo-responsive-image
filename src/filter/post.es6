@@ -1,4 +1,4 @@
-require('babel-polyfill')
+if (!global._babelPolyfill) require('babel-polyfill')
 import _ from 'underscore'
 import Parser from '../parser'
 import fs from 'hexo-fs'
