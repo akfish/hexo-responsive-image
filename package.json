@@ -7,7 +7,8 @@
     "lint": "standard --verbose src/**/*.es6 | snazzy",
     "pretest": "gulp clean:test && gulp asset:test",
     "test": "gulp test",
-    "prepublish": "gulp clean && gulp es6"
+    "prepublish": "gulp clean && gulp es6",
+    "postinstall": "cd ../.. && npm install --save hexo-inject"
   },
   "repository": {
     "type": "git",
@@ -59,6 +60,7 @@
     "bluebird": "^3.3.4",
     "gm": "^1.21.1",
     "hexo-fs": "^0.1.5",
+    "picturefill": "^3.0.2",
     "underscore": "^1.8.3"
   }
 }

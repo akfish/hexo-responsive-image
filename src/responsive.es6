@@ -1,6 +1,7 @@
 import _ from 'underscore'
 import Promise from 'bluebird'
 import PostFilter from './filter/post'
+import InjectFilter from './filter/inject'
 import ImageProcessor from './processor'
 import ImageGenerator from './generator/image'
 import { getOptions } from './option'
@@ -12,9 +13,11 @@ export default class Responsive {
     this.opts = getOptions(opts || hexo.config.responsive)
     this._imageGenerator = new ImageGenerator(this)
     this._postFilter = new PostFilter(this)
+    this._injectFilter = new InjectFilter(this)
     this.plugins = [
       this._postFilter,
-      this._imageGenerator
+      this._imageGenerator,
+      this._injectFilter
     ]
     this.processor = new ImageProcessor(this.opts)
     this._tasks = {}

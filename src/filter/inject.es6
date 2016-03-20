@@ -4,9 +4,11 @@ export default class Inject {
   }
   register () {
     let { filter } = this.hexo.extend
-    filter.register('after_render:html', this._transform.bind(this))
+    filter.register('inject_ready', this._transform.bind(this))
   }
-  _transform (src) {
-
+  _transform (inject) {
+    inject.headEnd.require('../../node_modules/picturefill/dist/picturefill.min.js', {
+      inline: false
+    })
   }
 }
