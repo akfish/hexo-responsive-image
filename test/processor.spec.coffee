@@ -33,6 +33,13 @@ describe "Processor", ->
 
     image
 
+  it "should attach size information to image", ->
+    this.timeout(0)
+    img = mockImage('/images/foo.jpg')
+
+    processor.process(img)
+      .then (img) ->
+        img.size.should.deep.equal(width: 6400, height: 3600)
   it "should process an image into multiple sizes", ->
     this.timeout(0)
     img = mockImage('/images/foo.jpg')

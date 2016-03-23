@@ -17,11 +17,15 @@ export default class ImageProcessor {
   }
   async _loadImage ({ absoluteSrc }) {
     let buf = await fs.readFile(absoluteSrc, { encoding: null, escape: false })
+    // Hash
     let hash = createHash('sha256')
     hash.update(buf)
-
     let sha = hash.digest('hex')
-    return [buf, sha]
+    // Size
+    let g = gm(buf)
+    let size = await g.sizeAsync()
+
+    return [buf, sha, size]
   }
   _getFileNames (image, sha) {
     let { srcset, file_name_pattern } = this.opts
@@ -74,8 +78,9 @@ export default class ImageProcessor {
     return dstFileInfo
   }
   async _process (image) {
-    let [ buf, sha ] = await this._loadImage(image)
-    let dstFiles = this._getFileNames(image, sha)
+    let [ buf, sha, size ] = await this._loadImage(image)
+    let dstFiles = this._getFileNames(image, sha, size)
+    image.size = size
     image.srcset = await Promise.map(dstFiles, (file) => this._resize(buf, file))
     return image
   }
