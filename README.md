@@ -2,12 +2,20 @@
 
 Responsive images for Hexo.
 
+## Disclaimer
+
+This plugin is **not** for public use and **no** technical support will be provided. Use with caution.
+It works for me and my theme. But it will **not** work for every possible combinations of Hexo themes & plugins.
+
+Known issues:
+- It does not work with Hexo's default theme landscape (and potentially any themes with fancybox) out-of-box 
+
 ## Usage
 
 ### Install
 
 ```bash
-$ npm install --save hexo-responsive-image
+$ npm install --save https://github.com/akfish/hexo-responsive-image.git
 ```
 
 You'll also need to install [Graphics Magick](http://www.graphicsmagick.org/).
