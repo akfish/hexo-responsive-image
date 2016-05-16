@@ -5,6 +5,7 @@ Responsive images for Hexo.
 ## Disclaimer
 
 This plugin is **not** for public use and **no** technical support will be provided. Use with caution.
+
 It works for me and my theme. But it will **not** work for every possible combinations of Hexo themes & plugins.
 
 Known issues:
